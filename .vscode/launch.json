@@ -1,0 +1,60 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "Run UAT Tests",
+            "type": "python",
+            "request": "launch",
+            "program": "${workspaceFolder}/runner.py",
+            "args": ["--env=uat", "--customer=common"],
+            "console": "integratedTerminal",
+            "justMyCode": false,
+            "env": {
+                "PYTHONPATH": "${workspaceFolder}"
+            }
+        },
+        {
+            "name": "Run Specific Feature",
+            "type": "python",
+            "request": "launch",
+            "program": "${workspaceFolder}/runner.py",
+            "args": ["--env=uat", "--customer=common", "--feature=access_selenium"],
+            "console": "integratedTerminal",
+            "justMyCode": false,
+            "env": {
+                "PYTHONPATH": "${workspaceFolder}"
+            }
+        },
+        {
+            "name": "Run with Debug",
+            "type": "python",
+            "request": "launch",
+            "program": "${workspaceFolder}/runner.py",
+            "args": ["--env=uat", "--customer=common", "--headless=false"],
+            "console": "integratedTerminal",
+            "justMyCode": false,
+            "env": {
+                "PYTHONPATH": "${workspaceFolder}"
+            }
+        },
+        {
+            "name": "Run Pytest Directly",
+            "type": "python",
+            "request": "launch",
+            "module": "pytest",
+            "args": [
+                "-v",
+                "-s",
+                "--env=uat",
+                "--customer=common",
+                "--headless=false",
+                "features/common/access_selenium.feature"
+            ],
+            "console": "integratedTerminal",
+            "justMyCode": false,
+            "env": {
+                "PYTHONPATH": "${workspaceFolder}"
+            }
+        }
+    ]
+}
