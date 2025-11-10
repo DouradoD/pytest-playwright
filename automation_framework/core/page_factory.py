@@ -108,7 +108,6 @@ class PageFactory:
         # Create page instance with dependencies
         return page_class(
             page=self._page,
-            base_url=self._base_url,
             locators=locator_class()  # Instantiate locators
         )
 

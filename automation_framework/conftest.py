@@ -1,5 +1,5 @@
 import pytest
-from playwright.sync_api import Page
+from playwright.sync_api import sync_playwright, Browser, BrowserContext, Page
 from core.page_factory import PageFactory
 from config.settings import get_settings
 
@@ -27,52 +27,46 @@ def customer(request):
     return request.config.getoption("--customer")
 
 @pytest.fixture(scope="session")
-def browser_type_launch_args(browser_type_launch_args, settings, request):
-    """
-    CORRECT FIXTURE: Override browser launch arguments.
-    This is the correct fixture name for pytest-playwright.
-    """
-    # Use --headed flag or settings
-    if request.config.getoption("--headed"):
-        headless = False
-        print("🚀 BROWSER: Headed mode (--headed flag detected)")
-    else:
-        headless = settings.headless
-        print(f"🚀 BROWSER: Headless mode from settings: {headless}")
+def playwright_browser(settings, request):
+    """ browser creation with full control."""
+    headless = getattr(settings, 'headless', True)
+    slow_mo = getattr(settings, 'slow_mo', 0)
     
-    launch_args = {
-        **browser_type_launch_args,
-        "headless": headless,
-    }
-    
-    # Add slow_mo for visual debugging in headed mode
-    if not headless and hasattr(settings, 'slow_mo') and settings.slow_mo > 0:
-        launch_args["slow_mo"] = settings.slow_mo
-        print(f"🚀 BROWSER: Slow motion: {settings.slow_mo}ms")
-    
-    print(f"🚀 BROWSER: Final launch args: {launch_args}")
-    return launch_args
+    with sync_playwright() as p:
+        browser = p.chromium.launch(
+            headless=headless,
+            slow_mo=slow_mo
+        )
+        print(f"🚀 BROWSER: Headless={headless}, SlowMo={slow_mo}ms")
+        yield browser
+        browser.close()
 
 @pytest.fixture
-def pages(page: Page, environment, customer, settings) -> PageFactory:
+def context(playwright_browser, settings):
+    """context creation."""
+    context = playwright_browser.new_context(
+        viewport=settings.viewport,
+        ignore_https_errors=settings.ignore_https_errors,
+        base_url=settings.base_url
+    )
+    yield context
+    context.close()
+
+@pytest.fixture
+def page(context):
+    """page creation."""
+    page = context.new_page()
+    yield page
+    page.close()
+
+@pytest.fixture
+def pages(page, environment, customer, settings) -> PageFactory:
     """
-    MAIN FIXTURE: Injects PageFactory with environment context.
+    Alternative PageFactory using browser/context/page.
     """
-    page_factory = PageFactory(
+    return PageFactory(
         page=page, 
         environment=environment,
         customer=customer,
         base_url=settings.base_url
     )
-    
-    return page_factory
-
-@pytest.fixture(scope="session")
-def browser_context_args(browser_context_args, settings):
-    """Configure browser context with global settings."""
-    return {
-        **browser_context_args,
-        "viewport": settings.viewport,
-        "ignore_https_errors": settings.ignore_https_errors,
-        "base_url": settings.base_url
-    }
