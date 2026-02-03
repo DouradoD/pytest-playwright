@@ -1,5 +1,0 @@
-config
-core
-helpers
-steps
-web

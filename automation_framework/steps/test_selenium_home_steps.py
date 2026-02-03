@@ -15,9 +15,9 @@ def navigate_to_url(pages, url: str, page: Page):
     launch_args = getattr(browser, '_launch_options', {})
     is_headless = launch_args.get('headless', True)
     
-    print(f"🎯 Browser: {browser_type}")
-    print(f"🎯 Headless mode: {is_headless}")
-    print(f"🎯 Launch args: {launch_args}")
+    print(f"Browser: {browser_type}")
+    print(f"Headless mode: {is_headless}")
+    print(f"Launch args: {launch_args}")
     # Use the exact page name from the decorator - "selenium_home"
     pages.selenium_home.navigate_to_url(url)
 

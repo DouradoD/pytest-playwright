@@ -27,7 +27,7 @@ def customer(request):
     return request.config.getoption("--customer")
 
 @pytest.fixture(scope="session")
-def playwright_browser(settings, request):
+def playwright_browser(settings):
     """ browser creation with full control."""
     headless = getattr(settings, 'headless', True)
     slow_mo = getattr(settings, 'slow_mo', 0)
@@ -37,7 +37,7 @@ def playwright_browser(settings, request):
             headless=headless,
             slow_mo=slow_mo
         )
-        print(f"🚀 BROWSER: Headless={headless}, SlowMo={slow_mo}ms")
+        print(f" BROWSER: Headless={headless}, SlowMo={slow_mo}ms")
         yield browser
         browser.close()
 
